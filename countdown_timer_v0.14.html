@@ -1,0 +1,175 @@
+<!--	
+Author: 	Shahed Sherkat
+Date: 		May 29, 2023
+Version: 	0.13
+Description: 	This html file is a portable single-page html/java-script countdown timer app 
+Feedback: 	Send your comments, feedbacks and suggestions to shahed.sherkat@gmail.com
+-->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Countdown Timer</title>
+    <style>
+        body {
+            background-color: green;
+            transition: background-color 1s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        h1 {
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        .countdown-container {
+            text-align: center;
+            padding: 20px;
+            background-color: #f2f2f2;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .countdown {
+            font-size: 72px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .input-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .input-container input[type="text"] {
+            font-size: 18px;
+            padding: 6px 10px;
+            margin-right: 10px;
+        }
+
+        .input-container button {
+            font-size: 18px;
+            padding: 6px 16px;
+        }
+
+        .blink {
+            animation: blink 0.5s infinite;
+        }
+
+        @keyframes blink {
+            50% {
+                background-color: red;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Countdown Timer</h1>
+    <div class="input-container">
+        <input type="text" id="time" placeholder="Enter time (hh:mm)" pattern="^(?:[01]\d|2[0-3]):[0-5]\d$" inputmode="numeric" onkeydown="startTimerOnEnter(event)">
+        <button onclick="startTimer()">Start Timer</button>
+        <button onclick="resetTimer()">Reset</button>
+    </div>
+
+    <div class="countdown-container">
+        <div class="countdown" id="countdown"></div>
+    </div>
+
+    <audio id="alarm"></audio>
+
+    <script>
+        var countdownInterval;
+        var alarm = document.getElementById('alarm');
+
+        function startTimer() {
+            var countdownElement = document.getElementById('countdown');
+            var timeInput = document.getElementById('time');
+            var timeString = timeInput.value;
+
+            var currentTime = new Date();
+            var targetTime = new Date(currentTime.toDateString() + ' ' + timeString);
+
+            if (currentTime > targetTime) {
+                // Add 24 hours if target time has already passed today
+                targetTime.setDate(targetTime.getDate() + 1);
+            }
+
+            countdownInterval = setInterval(function() {
+                var remainingTime = targetTime - new Date();
+
+                if (remainingTime <= 0) {
+                    clearInterval(countdownInterval);
+                    countdownElement.textContent = "Time's up!";
+                    playAlarm();
+                    return;
+                }
+
+                var hoursRemaining = Math.floor((remainingTime / (1000 * 60 * 60)) % 24);
+                var minutesRemaining = Math.floor((remainingTime / (1000 * 60)) % 60);
+                var secondsRemaining = Math.floor((remainingTime / 1000) % 60);
+
+                countdownElement.textContent = formatTime(hoursRemaining) + ":" + formatTime(minutesRemaining) + ":" + formatTime(secondsRemaining);
+
+                if (remainingTime <= 60000) { // 1 minute
+                    document.body.style.backgroundColor = "yellow";
+                }
+
+                if (remainingTime <= 30000) { // 30 seconds
+                    document.body.classList.add("blink");
+                }
+            }, 1000);
+        }
+
+        function startTimerOnEnter(event) {
+            if (event.keyCode === 13) {
+                startTimer();
+            }
+        }
+
+        function resetTimer() {
+            clearInterval(countdownInterval);
+            stopAlarm();
+            document.getElementById('countdown').textContent = "00:00:00";
+            document.body.style.backgroundColor = "green";
+            document.body.classList.remove("blink");
+        }
+
+        function formatTime(time) {
+            return time < 10 ? "0" + time : time;
+        }
+
+        function playAlarm() {
+            alarm.src = 'https://soundbible.com/grab.php?id=2218&type=mp3'; // Alarm sound from SoundHelix.com
+            alarm.loop = true;
+            alarm.play();
+        }
+
+        function stopAlarm() {
+            alarm.pause();
+            alarm.currentTime = 0;
+            alarm.loop = false;
+        }
+    </script>
+ <script>
+        // Existing JavaScript code
+
+        // New JavaScript for the copyright line
+        var footer = document.createElement("div");
+        footer.classList.add("copyright");
+        footer.style.fontSize = "smaller"
+        footer.innerHTML = "&copy; 2023 NerdIT Soultions Inc.";
+        document.body.appendChild(footer);
+    </script>
+</body>
+</html>
+
